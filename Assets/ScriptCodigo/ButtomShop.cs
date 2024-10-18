@@ -1,43 +1,49 @@
-using System.Collections;  // Importa el espacio de nombres para las colecciones.
-using System.Collections.Generic;  // Importa el espacio de nombres para colecciones genéricas.
-using UnityEngine;  // Importa el espacio de nombres para funcionalidades de Unity.
-using TMPro;  // Importa el espacio de nombres para TextMeshPro, un sistema de texto avanzado en Unity.
+using System.Collections; // Espacio de nombres para colecciones.
+using System.Collections.Generic; // Espacio de nombres para colecciones genéricas.
+using UnityEngine; // Funcionalidades de Unity.
+using TMPro; // Sistema de texto avanzado en Unity.
 
 public class ButtomShop : MonoBehaviour
 {
-    // Referencia a la clase 'Cartera', que se supone maneja el saldo del jugador.
     [SerializeField]
-    Cartera myWallet;  // Variable privada para almacenar la referencia a la billetera del jugador.
+    private Cartera myWallet; // Referencia a la cartera del jugador.
 
-    // Variable para el componente de texto que mostrará el precio del objeto.
-    TextMeshProUGUI textoBotton;  // Componente de texto donde se mostrará el precio del objeto.
-
-    // Nombre del ítem que se va a comprar.
     [SerializeField]
-    string nameItem = "objeto";  // Nombre del artículo a comprar (se puede modificar en el inspector).
+    private string[] posiblesNombres; // Nombres posibles para los ítems.
 
-    // Precio del ítem.
+    private TextMeshProUGUI textoBotton; // Componente de texto para mostrar el precio del ítem.
+
     [SerializeField]
-    float priceItem;  // Precio del artículo que se va a mostrar y restar de la billetera.
+    private string nameItem = "objeto"; // Nombre del ítem a comprar.
 
-    // Método Start se llama antes de la primera actualización del frame.
-    void Start()
+    [SerializeField]
+    private float priceItem; // Precio del ítem.
+
+    // Método Start que se ejecuta al iniciar el juego.
+    private void Start()
     {
-        // Obtiene el componente TextMeshProUGUI del primer hijo del objeto actual.
         textoBotton = transform.GetChild(0).GetComponent<TextMeshProUGUI>();
 
-        // Asigna un precio aleatorio al ítem dentro del rango de 25 a 500 euros.
+        // Asigna un nombre y precio aleatorio al ítem.
+        nameItem = posiblesNombres[Random.Range(0, posiblesNombres.Length)];
         priceItem = Random.Range(25f, 500f);
 
-        // Convierte el precio a string y lo asigna al texto del botón, seguido de " €".
-        textoBotton.text = priceItem.ToString() + " €";
+        // Formatea el texto del botón para mostrar el precio.
+        textoBotton.text = priceItem.ToString("0.00") + " €\n" + nameItem;
     }
 
-    // Método que se llama cuando el botón de la tienda es presionado.
+    // Método que se llama al presionar el botón de la tienda.
     public void ClickEnBotonDeTienda()
     {
-        // Llama al método 'RestarSaldo' de la cartera, restando el precio del ítem.
-        myWallet.RestarSaldo(priceItem);
+        // Genera un nuevo nombre y precio al presionar el botón.
+        nameItem = posiblesNombres[Random.Range(0, posiblesNombres.Length)];
+        priceItem = Random.Range(25f, 500f);
+
+        // Informa a la cartera sobre la compra del ítem.
+        myWallet.InformarCompra(nameItem, priceItem);
     }
 }
+
+
+
 

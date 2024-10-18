@@ -1,56 +1,73 @@
-using System.Collections;  // Importa el espacio de nombres para las colecciones.
-using System.Collections.Generic;  // Importa el espacio de nombres para colecciones genéricas.
-using UnityEngine;  // Importa el espacio de nombres para funcionalidades de Unity.
-using TMPro;  // Importa el espacio de nombres para TextMeshPro, un sistema de texto avanzado en Unity.
+using System.Collections;  // Espacio de nombres para colecciones.
+using System.Collections.Generic;  // Espacio de nombres para colecciones genéricas.
+using UnityEngine;  // Espacio de nombres para funcionalidades de Unity.
+using TMPro;  // Espacio de nombres para el sistema de texto avanzado en Unity.
 
 public class Cartera : MonoBehaviour
 {
-    // Variable privada que almacena el saldo actual del jugador.
-    float saldo;  // Saldo inicial de la cartera.
+    private float saldo;  // Saldo actual del jugador.
+    private float precioOQ;  // Precio del objeto en consulta.
 
-    // Componente de texto donde se mostrará el saldo.
     [SerializeField]
-    TextMeshProUGUI LabelSaldo;  // Referencia al texto que muestra el saldo.
+    private TextMeshProUGUI LabelSaldo;  // Etiqueta para mostrar el saldo del jugador.
 
-    // GameObjects para mostrar mensajes de compra.
     [SerializeField]
-    GameObject confirmarCompra;  // Mensaje de confirmación de compra (no se utiliza en el código actual).
-    [SerializeField]
-    GameObject noSaldo;  // Mensaje que se muestra si el saldo es insuficiente.
+    private TextMeshProUGUI labelConfirmo;  // Etiqueta para mostrar el mensaje de confirmación de compra.
 
-    // Start se llama antes de la primera actualización del frame.
-    void Start()
+    [SerializeField]
+    private GameObject confirmarCompra;  // Panel para confirmar la compra.
+
+    [SerializeField]
+    private GameObject noSaldo;  // Panel de alerta de saldo insuficiente.
+
+    // Método Start que se ejecuta al iniciar el juego.
+    private void Start()
     {
-        // Asigna un saldo aleatorio al jugador dentro del rango de 450 a 950 euros.
+        // Asigna un saldo aleatorio entre 450 y 950 euros y actualiza la etiqueta.
         saldo = Random.Range(450f, 950f);
+        LabelSaldo.text = saldo.ToString("0.00") + " €";
 
-        // Configura el texto del saldo, asegurando que tenga un formato de 3 dígitos, un decimal y el símbolo de euro.
-        LabelSaldo.text = saldo.ToString("000.0" + " €");
+        // Desactiva los paneles de compra al inicio.
+        confirmarCompra.SetActive(false);
+        noSaldo.SetActive(false);
     }
 
-    // Método para restar una cantidad del saldo.
-    public void RestarSaldo(float precio)
+    // Método llamado cuando el jugador intenta comprar un objeto.
+    public void InformarCompra(string nameItem, float precio)
     {
-        // Verifica si hay suficiente saldo para realizar la compra.
-        if (saldo > precio)
+        if (saldo >= precio)  // Verifica si hay saldo suficiente.
         {
-            // Resta el precio del saldo actual.
-            saldo -= precio;
-
-            // Actualiza el texto del saldo después de la compra.
-            LabelSaldo.text = saldo.ToString("000.0" + " €");
+            labelConfirmo.text = $"¿Estás seguro que quieres comprar {nameItem} por {precio} €?";  // Mensaje de confirmación.
+            confirmarCompra.SetActive(true);  // Activa el panel de confirmación.
+            precioOQ = precio;  // Almacena el precio para usarlo al confirmar la compra.
         }
         else
         {
-            // Activa el GameObject que informa al jugador que no tiene saldo suficiente.
-            noSaldo.SetActive(true);
+            noSaldo.SetActive(true);  // Muestra alerta de saldo insuficiente.
         }
     }
 
-    // Update se llama una vez por frame, pero no se utiliza en este caso.
-    void Update()
-    {
+    // Métodos para cerrar los paneles.
+    public void CerrarSaldo() => noSaldo.SetActive(false);  // Cierra el panel de saldo insuficiente.
 
+    public void CerrarCompra() => confirmarCompra.SetActive(false);  // Cierra el panel de confirmación.
+
+    // Método que completa la compra.
+    public void Comprar()
+    {
+        if (saldo >= precioOQ)  // Verifica si hay saldo suficiente para completar la compra.
+        {
+            saldo -= precioOQ;  // Descuenta el precio del saldo actual.
+            precioOQ = 0.0f;  // Reinicia el precio después de la compra.
+            LabelSaldo.text = saldo.ToString("0.00") + " €";  // Actualiza el saldo mostrado.
+            confirmarCompra.SetActive(false);  // Cierra el panel de confirmación.
+        }
+        else
+        {
+            noSaldo.SetActive(true);  // Muestra alerta de saldo insuficiente.
+        }
     }
 }
+
+
 
